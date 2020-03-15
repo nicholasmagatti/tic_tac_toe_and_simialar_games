@@ -1,14 +1,20 @@
 from constants import *
+from player import Player
 
 
 class GameManager:
 
     # array_players contains an array of int numbers, that identify each player
-    def __init__(self, rows, columns, marks_to_win, array_players):
+    def __init__(self, rows: int, columns: int, marks_to_win: int, players: list, computer_difficulty=None):
         self.MARKS_TO_WIN = marks_to_win
-        self.players = array_players
+        self.players = players
         # initialize the matrix (representing the board)
         self.matrix = [[EMPTY_CELL]*columns for r in range(rows)]
+        self.COMPUTER_DIFFICULTY_LEVEL = computer_difficulty
+
+    def start(self):
+        # TODO
+        pass
 
     def display_matrix(self):
         for i in range(0, len(self.matrix)):
@@ -37,34 +43,34 @@ class GameManager:
 
     # Return the winner id if there is one, return None otherwise
     def winner(self):
+
         # find winner in lines (horizontal win)
         for line in self.matrix:
             same_marks = 1
-            mark = line[0]
-            if mark != EMPTY_CELL:
-                while mark == line[same_marks]:
+            for i in range(1, len(line)):
+                if line[i] != EMPTY_CELL & line[i] == line[i-1]:
                     same_marks += 1
                     if same_marks == self.MARKS_TO_WIN:
-                        return mark
+                        return line[i]
+                else:  # reset same_marks
+                    same_marks = 1
 
         # find winner in columns (vertical win)
         for col in range(len(self.matrix[0]) - 1):
             same_marks = 1
-            mark = self.matrix[0][col]
-            if mark != EMPTY_CELL:
-                for row in range(1, len(self.matrix)):
-                    if self.matrix[row][col] == mark:
-                        same_marks += 1
+            for row in range(1, len(self.matrix)):
+                analyzed_mark = self.matrix[row][col]
+                if analyzed_mark != EMPTY_CELL & analyzed_mark == self.matrix[row - 1][col]:
+                    same_marks += 1
                     if same_marks == self.MARKS_TO_WIN:
-                        return mark
+                        return analyzed_mark
 
-        # find winner in diagonal
-
-        """ First diagonal:
+        """ Find winner in first diagonal:
             [1, 0, 0]
             [0, 1, 0]
             [0, 0, 1]
         """
+        # TODO not necessarily starting from matrix[0][0]
         same_marks = 1
         mark = self.matrix[0][0]
         if mark != EMPTY_CELL:
@@ -74,12 +80,12 @@ class GameManager:
                 if same_marks == self.MARKS_TO_WIN:
                     return mark
 
-        """ Second diagonal:
+        """ Find winner in second diagonal:
                     [0, 0, 1]
                     [0, 1, 0]
                     [1, 0, 0]
         """
-        # TODO fix bug: it does not work
+        # TODO not necessarily starting from matrix[0][index_max]
         same_marks += 1
         index_max = len(self.matrix) - 1
         mark = self.matrix[0][index_max]
