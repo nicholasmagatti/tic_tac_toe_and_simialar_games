@@ -1,12 +1,15 @@
 import random
 from game_manager import *
+from human_player import HumanPlayer
+from automatic_player import AutomaticPlayer
 from user_input_manager import *
 
 
 def main():
-    print("Welcome!")
+    print("Welcome!!!")
     while True:  # infinite loop
-        print("Choose details for a new game:")
+        print("Start a new game!")
+        print("Choose settings.")
         lines = custom_int_input("Number of rows: ", range(3, 31))
         columns = custom_int_input("Number of columns: ", range(3, 31))
         marks_to_win_the_game = custom_int_input(
@@ -40,18 +43,18 @@ def main():
         player_list = []
         # start from the users
         for name in username_list:
-            player_list.append(Player(True, name))
+            player_list.append(HumanPlayer(name))
         # add the other players (controlled by the computer)
         for i in range(number_of_players - number_of_human_users):
-            player_list.append(Player(False))
-        # shuffle order
+            player_list.append(AutomaticPlayer(computer_difficulty_level))
+        # order the players randomly
         random.shuffle(player_list)
         # assign ids
-        for i in range(1, len(player_list)):
-            player_list[i].set_id(i)
+        for i in range(0, len(player_list)):
+            player_list[i].set_id(i+1)
 
         # set and start the game
-        GameManager(lines, columns, marks_to_win_the_game, player_list).start()
+        GameManager(lines, columns, marks_to_win_the_game, player_list).start_game()
 
 
 if __name__ == '__main__':

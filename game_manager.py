@@ -1,5 +1,6 @@
+import random
 from constants import *
-from player import Player
+from user_input_manager import *
 
 
 class GameManager:
@@ -11,14 +12,75 @@ class GameManager:
         # initialize the matrix (representing the board)
         self.matrix = [[EMPTY_CELL]*columns for r in range(rows)]
         self.COMPUTER_DIFFICULTY_LEVEL = computer_difficulty
+        self.player_of_current_turn = players[0]
 
-    def start(self):
-        # TODO
-        pass
+    def start_game(self):
+        while (self.winner() is None) & (not self.is_tie()):
+            self.display_matrix()
+            self.manage_current_turn()
+            self.change_turn()
+
+        self.display_matrix()
+        winner = self.winner()
+        if self.is_tie():
+            print("Tie. Nobody won.")
+        else:
+            print("The player number " + str(winner) + " won!!!")
+
+    def change_turn(self):
+        index_player_current_turn = self.players.index(self.player_of_current_turn)
+        if index_player_current_turn == len(self.players) - 1:
+            self.player_of_current_turn = self.players[0]
+        else:
+            self.player_of_current_turn = self.players[index_player_current_turn + 1]
+
+    def manage_current_turn(self):
+        player_number = self.player_of_current_turn.get_id()
+        if self.player_of_current_turn.is_human():
+            # uppercase only first letter of the name
+            name_to_print = self.player_of_current_turn.name
+            name_to_print = name_to_print[0].upper() + name_to_print[1:]
+            print(name_to_print + ": it's your turn!")
+            print("You are the number " + str(player_number) + ".")
+            self.make_user_move(player_number)
+        else:
+            print("Turn of the player number " + str(player_number))
+            self.make_automatic_player_move()
+
+    def make_user_move(self, user_number: int):
+        acceptable_lines = self.available_lines()
+        # making elements start from 1 instead of 0
+        # acceptable_lines = list(map(lambda x: x + 1, acceptable_lines))
+        acceptable_lines = add_n_to_each_element(1, acceptable_lines)
+        # less one to make it start from 0 instead of 1
+        chosen_line = custom_int_input("line: ", acceptable_lines) - 1
+        available_columns = self.available_columns_on_specified_line(chosen_line)
+        # making elements start from 1 instead of 0
+        available_columns = add_n_to_each_element(1, available_columns)
+        # less one to make it start from 0 instead of 1
+        chosen_col = custom_int_input("column: ", available_columns) - 1
+
+        self.make_move_if_empty_cell(chosen_line, chosen_col, user_number)
+
+    def make_automatic_player_move(self):
+        mode = self.player_of_current_turn.difficulty_level
+        if mode == DIFFICULTY_LEVEL_RANDOM:
+            line = random.choice(self.available_lines())
+            column = random.choice(self.available_columns_on_specified_line(line))
+            self.make_move_if_empty_cell(line, column, self.player_of_current_turn.get_id())
 
     def display_matrix(self):
         for i in range(0, len(self.matrix)):
             print(self.matrix[i])
+
+    def get_matrix_copy(self):
+        return self.matrix.copy()
+
+    def is_tie(self):
+        for line in self.matrix:
+            if EMPTY_CELL in line:
+                return False
+        return True
 
     def available_lines(self):
         markable_lines = []
@@ -35,7 +97,9 @@ class GameManager:
                 available_columns.append(col)
         return available_columns
 
-    def make_move(self, line, column, player_mark):
+    def make_move_if_empty_cell(self, line, column, player_mark):
+        if self.matrix[line][column] != EMPTY_CELL:
+            raise Exception("The chosen cell is not empty.")
         self.matrix[line][column] = player_mark
 
     def no_available_cells_remaining(self):
@@ -48,7 +112,7 @@ class GameManager:
         for line in self.matrix:
             same_marks = 1
             for i in range(1, len(line)):
-                if line[i] != EMPTY_CELL & line[i] == line[i-1]:
+                if (line[i] != EMPTY_CELL) & (line[i] == line[i-1]):
                     same_marks += 1
                     if same_marks == self.MARKS_TO_WIN:
                         return line[i]
@@ -60,7 +124,7 @@ class GameManager:
             same_marks = 1
             for row in range(1, len(self.matrix)):
                 analyzed_mark = self.matrix[row][col]
-                if analyzed_mark != EMPTY_CELL & analyzed_mark == self.matrix[row - 1][col]:
+                if (analyzed_mark != EMPTY_CELL) & (analyzed_mark == self.matrix[row - 1][col]):
                     same_marks += 1
                     if same_marks == self.MARKS_TO_WIN:
                         return analyzed_mark
@@ -71,6 +135,7 @@ class GameManager:
             [0, 0, 1]
         """
         # TODO not necessarily starting from matrix[0][0]
+        """
         same_marks = 1
         mark = self.matrix[0][0]
         if mark != EMPTY_CELL:
@@ -79,13 +144,14 @@ class GameManager:
                     same_marks += 1
                 if same_marks == self.MARKS_TO_WIN:
                     return mark
-
+        """
         """ Find winner in second diagonal:
                     [0, 0, 1]
                     [0, 1, 0]
                     [1, 0, 0]
         """
         # TODO not necessarily starting from matrix[0][index_max]
+        """
         same_marks += 1
         index_max = len(self.matrix) - 1
         mark = self.matrix[0][index_max]
@@ -94,6 +160,6 @@ class GameManager:
                 same_marks += 1
             if same_marks == self.MARKS_TO_WIN:
                 return mark
-
+        """
         # if no winner has been found
         return None

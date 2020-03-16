@@ -20,5 +20,5 @@ def custom_int_input(message_before_input: str, acceptable_inputs: Union[list, r
     return input_received
 
 
-def add_n_to_each_element(n, list_par: Union[list, range]):
-    return list(map(lambda x: x + n, list_par))
+def add_n_to_each_element(n, list_to_modify: Union[list, range]):
+    return list(map(lambda x: x + n, list_to_modify))
