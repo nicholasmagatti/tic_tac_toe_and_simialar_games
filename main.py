@@ -17,7 +17,8 @@ def main():
             range(3, max(lines, columns) + 1))
         number_of_players = custom_int_input("Number of players: ", range(2, 10))
         number_of_human_users = custom_int_input("Number of human users: ", range(number_of_players + 1))
-        print("Write the name of each user: ")
+        if number_of_human_users > 0:
+            print("Write the name of each user: ")
         username_list = []
         for n in range(number_of_human_users):
             acceptable_name_received = False
@@ -30,15 +31,18 @@ def main():
                     username_list.append(name_received)
                 else:
                     print("This username is already taken")
-        print("Choose the level of the players controlled by the computer: ")
         acceptable_inputs_difficulty_level = []
         if number_of_players > number_of_human_users:
-            for i in range(0, len(DIFFICULTY_LEVELS)):
-                print(i + 1, ":", DIFFICULTY_LEVELS[i])
-                acceptable_inputs_difficulty_level.append(i)
-            computer_difficulty_level = DIFFICULTY_LEVELS[
-                custom_int_input("Chosen level: ",
-                                 add_n_to_each_element(1, acceptable_inputs_difficulty_level)) - 1]
+            if len(DIFFICULTY_LEVELS) > 1:
+                print("Choose the level of the players controlled by the computer: ")
+                for i in range(0, len(DIFFICULTY_LEVELS)):
+                    print(i + 1, ":", DIFFICULTY_LEVELS[i])
+                    acceptable_inputs_difficulty_level.append(i)
+                computer_difficulty_level = DIFFICULTY_LEVELS[
+                    custom_int_input("Chosen level: ",
+                                     add_n_to_each_element(1, acceptable_inputs_difficulty_level)) - 1]
+            else:
+                computer_difficulty_level = DIFFICULTY_LEVELS[0]
         # create the list of the players
         player_list = []
         # start from the users

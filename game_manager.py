@@ -1,4 +1,5 @@
 import random
+import time
 from constants import *
 from user_input_manager import *
 
@@ -15,17 +16,17 @@ class GameManager:
         self.player_of_current_turn = players[0]
 
     def start_game(self):
-        while (self.winner() is None) & (not self.is_tie()):
+        while (self.winner() is None) & (not self.is_matrix_full()):
             self.display_matrix()
             self.manage_current_turn()
             self.change_turn()
 
         self.display_matrix()
         winner = self.winner()
-        if self.is_tie():
-            print("Tie. Nobody won.")
-        else:
+        if winner is not None:
             print("The player number " + str(winner) + " won!!!")
+        else:
+            print("Tie. Nobody won.")
 
     def change_turn(self):
         index_player_current_turn = self.players.index(self.player_of_current_turn)
@@ -44,8 +45,20 @@ class GameManager:
             print("You are the number " + str(player_number) + ".")
             self.make_user_move(player_number)
         else:
-            print("Turn of the player number " + str(player_number))
+            print("Turn of the player number " + str(player_number) + ":")
+            """
+            Sleep for a while, so that users see automatic players wait a short time
+            before making their move, as they were real users.
+            In case the move already took a relevant amount of time, measure its
+            execution time to decide then a suitable sleep duration.
+            """
+            min_seconds_wait = 2.1
+            start_timer = time.time()
             self.make_automatic_player_move()
+            seconds_elapsed = time.time() - start_timer
+            sleep_duration = min_seconds_wait - seconds_elapsed
+            if sleep_duration > 0:
+                time.sleep(sleep_duration)
 
     def make_user_move(self, user_number: int):
         acceptable_lines = self.available_lines()
@@ -76,7 +89,7 @@ class GameManager:
     def get_matrix_copy(self):
         return self.matrix.copy()
 
-    def is_tie(self):
+    def is_matrix_full(self):
         for line in self.matrix:
             if EMPTY_CELL in line:
                 return False
