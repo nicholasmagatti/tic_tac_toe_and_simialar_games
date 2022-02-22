@@ -13,5 +13,5 @@ class HumanPlayer(Player):
         :param name: name of the player
         """
         self.name = name
-        # set human = false in the superclass
+        # set human = true in the superclass
         super(HumanPlayer, self).__init__(True)

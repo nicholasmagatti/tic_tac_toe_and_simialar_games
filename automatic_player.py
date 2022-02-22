@@ -14,10 +14,11 @@ class AutomaticPlayer(Player):
         :param difficulty_level: intelligence level for this player controlled
             by the computer
         """
-        self.difficulty_level = difficulty_level
-        # set human = false in the superclass
         if difficulty_level not in DIFFICULTY_LEVELS:
             raise Exception("The difficulty level '" + difficulty_level + "' does not exist")
+
+        self.difficulty_level = difficulty_level
+        # set human = false in the superclass
         super(AutomaticPlayer, self).__init__(False)
 
     def get_difficulty_level(self) -> str:
